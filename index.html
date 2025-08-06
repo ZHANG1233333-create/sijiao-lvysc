@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>泗交镇旅游手册</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 100%);
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+            height: 100%;
+            position: relative;
+        }
+        
+        .container {
+            max-width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        /* 简洁头部样式 */
+        .header {
+            background: linear-gradient(135deg, #2c6e49 0%, #4c956c 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.15);
+        }
+        
+        .header h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        /* 轮播图容器 */
+        .slider-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            padding: 15px;
+        }
+        
+        .slides-wrapper {
+            position: relative;
+            height: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+            background: white;
+        }
+        
+        .slides {
+            display: flex;
+            transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+            height: 100%;
+            will-change: transform;
+        }
+        
+        .slide {
+            min-width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: white;
+            position: relative;
+        }
+        
+        .slide-number {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(44, 110, 73, 0.9);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            z-index: 2;
+        }
+        
+        .slide-img-container {
+            width: 100%;
+            height: 60vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            border-radius: 12px;
+            background: #f8f9fa;
+            position: relative;
+            border: 1px solid #eee;
+        }
+        
+        .slide-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: opacity 0.5s ease;
+            opacity: 0;
+        }
+        
+        .slide-img.loaded {
+            opacity: 1;
+        }
+        
+        .slide-info {
+            width: 100%;
+            text-align: center;
+            font-size: 1rem;
+            color: #444;
+            padding: 20px 10px 10px;
+            font-weight: 500;
+        }
+        
+        /* 分页指示器 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            gap: 8px;
+        }
+        
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #c1c1c1;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .dot.active {
+            background: #2c6e49;
+            transform: scale(1.2);
+        }
+        
+        /* 导航按钮 */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .nav-btn {
+            background: #2c6e49;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(44, 110, 73, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover {
+            background: #4c956c;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(44, 110, 73, 0.4);
+        }
+        
+        .nav-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .nav-btn i {
+            font-size: 1.1rem;
+        }
+        
+        /* 视频部分 */
+        .video-section {
+            padding: 0 15px 30px;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 1.3rem;
+            color: #2c6e49;
+            margin-bottom: 20px;
+            font-weight: 600;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 3px;
+            background: #4c956c;
+            margin: 10px auto 0;
+            border-radius: 3px;
+        }
+        
+        .video-container {
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            background: #000;
+        }
+        
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 比例 */
+            height: 0;
+        }
+        
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .video-desc {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 15px;
+            padding: 0 15px;
+        }
+        
+        /* 优化提示 */
+        .optimization-info {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #4c956c;
+            margin-top: 15px;
+            padding: 0 20px;
+            background: rgba(76, 149, 108, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        /* 加载指示器 */
+        .loading-indicator {
+            display: none;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #4c956c;
+            margin-top: 10px;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 5px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: #4c956c;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        /* 响应式调整 */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 500px;
+                margin: 0 auto;
+                box-shadow: 0 0 30px rgba(0,0,0,0.1);
+                height: auto;
+                min-height: 100vh;
+            }
+            
+            .nav-btn {
+                padding: 12px 30px;
+            }
+        }
+        
+        /* 加载骨架屏 */
+        .skeleton {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 8px;
+        }
+        
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+        
+        /* 图片加载提示 */
+        .image-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #4c956c;
+            font-size: 0.9rem;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-mountain"></i> 泗交镇旅游手册</h1>
+        </div>
+        
+        <div class="slider-container">
+            <div class="slides-wrapper">
+                <div class="slides" id="slides">
+                    <!-- 幻灯片动态生成 -->
+                </div>
+            </div>
+            
+            <div class="pagination" id="pagination">
+                <!-- 分页点动态生成 -->
+            </div>
+            
+            <!-- 导航按钮 -->
+            <div class="nav-buttons">
+                <button id="prevBtn" class="nav-btn">
+                    <i class="fas fa-chevron-left"></i> 上一页
+                </button>
+                <button id="nextBtn" class="nav-btn">
+                    下一页 <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+  
+            <div class="loading-indicator" id="loadingIndicator">
+                <i class="fas fa-spinner fa-spin"></i> 加载中...
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="video-section">
+            <h2 class="section-title">旅游宣传片</h2>
+            <div class="video-container">
+                <div class="video-wrapper">
+                    <iframe src="https://v.qq.com/txp/iframe/player.html?vid=g3574wttvjw" allowfullscreen></iframe>
+                </div>
+            </div>
+            <p class="video-desc">感受泗交镇的自然风光与人文魅力</p>
+        </div>
+    </div>
+    
+    <script>
+        // 图片数据 - 托管在CDN服务器上
+        const images = [
+            { 
+                name: "封面",
+                text: "天然氧吧 康养泗交",
+                url: "https://res.cloudinary.com/danbgpdpr/image/upload/v1752046290/1_unhvsb.jpg"
+            },
+            { 
+                name: "旅游地图",
+                text: "泗交镇全域旅游地图",
+                url: "https://res.cloudinary.com/danbgpdpr/image/upload/v1754470114/2_yrxufz.jpg"
+            },
+            { 
+                name: "旅游线路",
+                text: "精心规划的旅游路线推荐",
+                url: "https://res.cloudinary.com/danbgpdpr/image/upload/v1751532280/3_p6cjse.jpg"
+            },
+            { 
+                name: "景点介绍",
+                text: "探索泗交镇独特景点",
+                url: "https://res.cloudinary.com/danbgpdpr/image/upload/v1751591080/4_hmiup5.jpg"
+            },
+            { 
+                name: "露营漂流",
+                text: "户外活动与冒险体验",
+                url: "https://res.cloudinary.com/danbgpdpr/image/upload/v1751513117/5_ahfpl8.jpg"
+            },
+            { 
+                name: "文化体验",
+                text: "传统工艺与文化展示",
+                url: "https://res.cloudinary.com/danbgpdpr/image/upload/v1751513117/6_zotbqy.jpg"
+            },
+            { 
+                name: "民宿美食",
+                text: "美宿泗交",
+                url: "https://res.cloudinary.com/danbgpdpr/image/upload/v1751591080/7_arb8ia.jpg"
+            },
+            { 
+                name: "住宿推荐",
+                text: "美宿泗交",
+                url: "https://res.cloudinary.com/danbgpdpr/image/upload/v1751513118/8_qr7v6y.jpg"
+            },
+            { 
+                name: "民宿列表",
+                text: "美宿泗交",
+                url: "https://res.cloudinary.com/danbgpdpr/image/upload/v1752046291/9_fenbco.jpg"
+            },
+            { 
+                name: "当地特产",
+                text: "泗交镇特色美食与产品",
+                url: "https://res.cloudinary.com/danbgpdpr/image/upload/v1751513116/10_cgxiqp.jpg"
+            },
+            { 
+                name: "特色餐厅",
+                text: "不可错过的美食体验",
+                url: "https://res.cloudinary.com/danbgpdpr/image/upload/v1751591081/11_gm6tls.jpg"
+            }
+        ];
+
+        // 获取DOM元素
+        const slidesContainer = document.getElementById('slides');
+        const paginationContainer = document.getElementById('pagination');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const progressBar = document.getElementById('progressBar');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        let currentSlide = 0;
+        let loadedImages = 0;
+        
+        // 初始化轮播
+        function initSlider() {
+            // 清空容器
+            slidesContainer.innerHTML = '';
+            paginationContainer.innerHTML = '';
+            
+            // 创建幻灯片和分页点
+            images.forEach((img, index) => {
+                // 创建幻灯片
+                const slide = document.createElement('div');
+                slide.className = 'slide';
+                
+                // 幻灯片编号
+                const slideNum = document.createElement('div');
+                slideNum.className = 'slide-number';
+                slideNum.textContent = index + 1;
+                slide.appendChild(slideNum);
+                
+                // 图片容器
+                const imgContainer = document.createElement('div');
+                imgContainer.className = 'slide-img-container';
+                
+                // 添加骨架屏和加载提示
+                const skeleton = document.createElement('div');
+                skeleton.className = 'skeleton';
+                
+                const loadingText = document.createElement('div');
+                loadingText.className = 'image-loading';
+                loadingText.innerHTML = `<i class="fas fa-spinner fa-spin"></i> 图片加载中...`;
+                
+                imgContainer.appendChild(skeleton);
+                imgContainer.appendChild(loadingText);
+                
+                // 创建图片元素
+                const image = document.createElement('img');
+                image.className = 'slide-img';
+                image.alt = img.name;
+                
+                // 设置图片加载事件
+                image.onload = () => {
+                    image.classList.add('loaded');
+                    skeleton.remove();
+                    loadingText.remove();
+                    
+                    // 更新加载进度
+                    loadedImages++;
+                    const progress = Math.min(100, Math.round((loadedImages / images.length) * 100));
+                    progressBar.style.width = `${progress}%`;
+                    
+                    // 所有图片加载完成时隐藏加载指示器
+                    if (loadedImages === images.length) {
+                        setTimeout(() => {
+                            loadingIndicator.style.display = 'none';
+                        }, 500);
+                    }
+                };
+                
+                image.onerror = () => {
+                    console.error('图片加载失败:', img.url);
+                    loadingText.innerHTML = '<i class="fas fa-exclamation-triangle"></i> 图片加载失败';
+                };
+                
+                // 延迟加载图片
+                if (index === 0) {
+                    // 第一张图片立即加载
+                    image.src = img.url;
+                } else {
+                    // 其他图片使用懒加载
+                    image.dataset.src = img.url;
+                }
+                
+                imgContainer.appendChild(image);
+                slide.appendChild(imgContainer);
+                
+          
+                
+                slidesContainer.appendChild(slide);
+                
+                // 创建分页点
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                dot.dataset.index = index;
+                if (index === 0) dot.classList.add('active');
+                paginationContainer.appendChild(dot);
+            });
+            
+            // 分页点点击事件
+            document.querySelectorAll('.dot').forEach(dot => {
+                dot.addEventListener('click', () => {
+                    goToSlide(parseInt(dot.dataset.index));
+                });
+            });
+            
+            // 导航按钮事件
+            prevBtn.addEventListener('click', () => goToSlide(currentSlide - 1));
+            nextBtn.addEventListener('click', () => goToSlide(currentSlide + 1));
+        }
+        
+        // 跳转到指定幻灯片
+        function goToSlide(index) {
+            const slides = document.querySelectorAll('.slide');
+            const dots = document.querySelectorAll('.dot');
+            const totalSlides = slides.length;
+            
+            if (index < 0) {
+                index = totalSlides - 1;
+            } else if (index >= totalSlides) {
+                index = 0;
+            }
+            
+            slidesContainer.style.transform = `translateX(-${index * 100}%)`;
+            
+            // 更新当前幻灯片索引
+            currentSlide = index;
+            
+            // 更新分页点
+            dots.forEach((dot, i) => {
+                if (i === index) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+            
+            // 加载当前图片（如果尚未加载）
+            const currentImg = slides[index].querySelector('.slide-img');
+            if (currentImg.dataset.src) {
+                currentImg.src = currentImg.dataset.src;
+                delete currentImg.dataset.src;
+            }
+            
+            // 预加载相邻图片
+            preloadAdjacentImages(index);
+        }
+        
+        // 预加载相邻图片以提升体验
+        function preloadAdjacentImages(currentIndex) {
+            const preloadIndexes = [
+                currentIndex - 1,
+                currentIndex + 1,
+                currentIndex - 2,
+                currentIndex + 2
+            ];
+            
+            preloadIndexes.forEach(index => {
+                if (index >= 0 && index < images.length) {
+                    const slide = slidesContainer.children[index];
+                    const img = slide.querySelector('.slide-img');
+                    if (img.dataset.src) {
+                        // 创建隐藏图片进行预加载
+                        const preloadImg = new Image();
+                        preloadImg.src = img.dataset.src;
+                        
+                        // 设置真实图片源
+                        img.src = img.dataset.src;
+                        delete img.dataset.src;
+                    }
+                }
+            });
+        }
+        
+        // 初始化轮播
+        initSlider();
+        
+        // 添加键盘支持
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                goToSlide(currentSlide - 1);
+            } else if (e.key === 'ArrowRight') {
+                goToSlide(currentSlide + 1);
+            }
+        });
+    </script>
+</body>
+</html>
